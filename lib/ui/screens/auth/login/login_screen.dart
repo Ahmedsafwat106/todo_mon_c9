@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 8),
             TextFormField(
               onChanged: (text) => password = text,
+              obscureText: true,
               decoration: const InputDecoration(label: Text("Password")),
             ),
             const SizedBox(height: 26),
@@ -64,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void loginLocally() async {
     AppUser? user = await AppUser.getUserFromLocal();
-    if (user != null && user.email == email) {
+    if (user != null && user.email == email && user.password == password) {
       AppUser.currentUser = user;
       Navigator.pushReplacementNamed(context, HomeScreen.routeName);
     } else {

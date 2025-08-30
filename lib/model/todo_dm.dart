@@ -5,19 +5,20 @@ class TodoDM {
   late DateTime date;
   late bool isDone;
 
-  TodoDM(
-      {required this.id,
-        required this.title,
-        required this.description,
-        required this.date,
-        required this.isDone});
+  TodoDM({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.date,
+    this.isDone = false,
+  });
 
   TodoDM.fromJson(Map json) {
     id = json["id"];
     title = json["title"];
     description = json["description"];
     date = DateTime.fromMillisecondsSinceEpoch(json["date"]);
-    isDone = json["isDone"];
+    isDone = json["isDone"] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -26,7 +27,7 @@ class TodoDM {
       "title": title,
       "description": description,
       "date": date.millisecondsSinceEpoch,
-      "isDone": isDone
+      "isDone": isDone,
     };
   }
 }

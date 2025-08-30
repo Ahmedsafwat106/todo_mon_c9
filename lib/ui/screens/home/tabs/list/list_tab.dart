@@ -6,6 +6,9 @@ import '../../../../utils/app_colors.dart';
 import '../../todo_widget.dart';
 
 class ListTab extends StatefulWidget {
+  final String searchQuery;
+  const ListTab({super.key, this.searchQuery = ""});
+
   @override
   State<ListTab> createState() => _ListTabState();
 }
@@ -24,6 +27,12 @@ class _ListTabState extends State<ListTab> {
   @override
   Widget build(BuildContext context) {
     provider = Provider.of(context);
+
+    // 🟢 فلترة التاسكات
+    final filteredTodos = provider.todos.where((task) {
+      return task.title.toLowerCase().contains(widget.searchQuery.toLowerCase());
+    }).toList();
+
     return Column(
       children: [
         SizedBox(
@@ -54,11 +63,9 @@ class _ListTabState extends State<ListTab> {
                   headerVisible: false,
                   calendarStyle: CalendarStyle(
                     selectedDecoration: BoxDecoration(
-                        color: AppColors.white,
-                        shape: BoxShape.circle),
+                        color: AppColors.white, shape: BoxShape.circle),
                     todayDecoration: BoxDecoration(
-                        color: AppColors.lightBlack,
-                        shape: BoxShape.circle),
+                        color: AppColors.lightBlack, shape: BoxShape.circle),
                     defaultTextStyle: TextStyle(color: AppColors.primiary),
                     weekendTextStyle: TextStyle(color: AppColors.primiary),
                   ),
@@ -68,9 +75,23 @@ class _ListTabState extends State<ListTab> {
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: provider.todos.length,
-            itemBuilder: (_, index) => TodoWidget(provider.todos[index]),
+          child: filteredTodos.isEmpty
+              ? const Center(
+            child: Text(
+              "No tasks found",
+              style: TextStyle(fontSize: 16),
+            ),
+          )
+              : AnimatedList(
+            key: provider.listKey,
+            initialItemCount: filteredTodos.length,
+            itemBuilder: (context, index, animation) {
+              final todo = filteredTodos[index];
+              return SizeTransition(
+                sizeFactor: animation,
+                child: TodoWidget(todo),
+              );
+            },
           ),
         ),
       ],

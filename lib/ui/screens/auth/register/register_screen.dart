@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../../model/app_user.dart';
-import '../../../utils/dialog_utils.dart';
 import '../../home/home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -34,6 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             TextFormField(
               onChanged: (text) => password = text,
+              obscureText: true,
               decoration: const InputDecoration(label: Text("Password")),
             ),
             const SizedBox(height: 26),
@@ -56,9 +56,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void registerLocally() async {
-    AppUser newUser = AppUser(id: DateTime.now().millisecondsSinceEpoch.toString(),
-        email: email,
-        username: username);
+    AppUser newUser = AppUser(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      email: email,
+      username: username,
+      password: password,
+    );
     await AppUser.saveUserLocally(newUser);
     Navigator.pushReplacementNamed(context, HomeScreen.routeName);
   }

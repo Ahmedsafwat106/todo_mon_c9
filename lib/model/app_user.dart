@@ -6,22 +6,36 @@ class AppUser {
   late String id;
   late String email;
   late String username;
+  late String password;
 
-  AppUser({required this.id, required this.email, required this.username});
+  AppUser({
+    required this.id,
+    required this.email,
+    required this.username,
+    required this.password,
+  });
 
   AppUser.fromJson(Map json) {
     id = json["id"];
     email = json["email"];
     username = json["username"];
+    password = json["password"];
   }
 
   Map<String, dynamic> toJson() {
-    return {"id": id, "email": email, "username": username};
+    return {
+      "id": id,
+      "email": email,
+      "username": username,
+      "password": password,
+    };
   }
+
+  String toJsonString() => json.encode(toJson());
 
   static Future<void> saveUserLocally(AppUser user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("current_user", json.encode(user.toJson()));
+    await prefs.setString("current_user", user.toJsonString());
     currentUser = user;
   }
 
@@ -35,7 +49,7 @@ class AppUser {
 
   static Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove("current_user");
+    await prefs.remove("current_user");
     currentUser = null;
   }
 }

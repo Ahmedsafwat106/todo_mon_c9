@@ -16,11 +16,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int currentTabIndex = 0;
   late ListProvider provider;
-  final List<Widget> tabs = [ListTab(), SettingsTab()];
+  final List<Widget> tabs = [ListTab(), const SettingsTab()];
 
   @override
   Widget build(BuildContext context) {
     provider = Provider.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("${AppUser.currentUser?.username ?? ""}"),
@@ -36,7 +37,14 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
-      body: tabs[currentTabIndex],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: currentTabIndex == 0
+              ? LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade50])
+              : LinearGradient(colors: [Colors.grey.shade300, Colors.white]),
+        ),
+        child: tabs[currentTabIndex],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
@@ -60,13 +68,12 @@ class _HomeScreenState extends State<HomeScreen> {
         clipBehavior: Clip.hardEdge,
         child: BottomNavigationBar(
           onTap: (index) {
-            currentTabIndex = index;
-            setState(() {});
+            setState(() => currentTabIndex = index);
           },
           currentIndex: currentTabIndex,
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.menu), label: ""),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: ""),
+            BottomNavigationBarItem(icon: Icon(Icons.checklist), label: "Tasks"),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
           ],
         ),
       ),
