@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../../model/app_user.dart';
 import '../../home/home_screen.dart';
+import '../login/login_screen.dart';
+
 
 class RegisterScreen extends StatefulWidget {
   static const String routeName = "register";
@@ -38,17 +40,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 26),
             ElevatedButton(
-                onPressed: registerLocally,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                  child: Row(
-                    children: [
-                      Text("Create account", style: TextStyle(fontSize: 18)),
-                      Spacer(),
-                      Icon(Icons.arrow_forward)
-                    ],
-                  ),
-                )),
+              onPressed: registerLocally,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                child: Row(
+                  children: [
+                    Text("Create account", style: TextStyle(fontSize: 18)),
+                    Spacer(),
+                    Icon(Icons.arrow_forward),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            InkWell(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+              },
+              child: const Text(
+                "Already have an account? Login",
+                style: TextStyle(fontSize: 18, color: Colors.black45),
+              ),
+            ),
           ],
         ),
       ),
@@ -56,6 +69,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void registerLocally() async {
+    if (email.isEmpty || password.isEmpty || username.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Please fill all fields")),
+      );
+      return;
+    }
+
     AppUser newUser = AppUser(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       email: email,

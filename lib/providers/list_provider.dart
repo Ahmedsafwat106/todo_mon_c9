@@ -41,7 +41,6 @@ class ListProvider extends ChangeNotifier {
     _allTodos.add(todo);
     applyFilter();
 
-    // ✅ جبنا الاندكس الحقيقي بعد ما اتعمل الفلتر
     final index = todos.indexWhere((t) => t.id == todo.id);
     if (index != -1) {
       listKey.currentState?.insertItem(index);
@@ -66,7 +65,6 @@ class ListProvider extends ChangeNotifier {
       final removed = _allTodos.removeAt(index);
       applyFilter();
 
-      // ✅ هنا لازم نجيب الاندكس من todos بعد التصفية
       final removedIndex = todos.indexWhere((t) => t.id == removed.id);
       if (removedIndex != -1) {
         listKey.currentState?.removeItem(
@@ -83,7 +81,7 @@ class ListProvider extends ChangeNotifier {
     }
   }
 
-  /// 🟢 دالة استيراد Tasks (Import)
+  /// 🟢 استيراد Tasks (Import)
   Future<void> importTasks(List<TodoDM> importedTasks) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -94,14 +92,13 @@ class ListProvider extends ChangeNotifier {
     // ضيف الجديد
     for (var task in importedTasks) {
       jsonList.add(task.toJson());
-      _allTodos.add(task);
     }
 
     // خزّنهم تاني
     await prefs.setString('todos', json.encode(jsonList));
 
-    // Refresh
-    applyFilter();
+    // 🟢 اقرأهم تاني عشان يتعرضوا في HomeScreen
+    await getTodosFromLocal();
   }
 
   void applyFilter() {

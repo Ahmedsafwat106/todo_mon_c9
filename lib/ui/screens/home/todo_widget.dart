@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../model/todo_dm.dart';
 import '../../../providers/list_provider.dart';
 import '../../utils/app_colors.dart';
@@ -25,7 +23,6 @@ class TodoWidget extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (_) async {
-              // 🟢 بدل ما نحذف يدوي من SharedPreferences
               await provider.deleteTodo(item);
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -68,10 +65,20 @@ class TodoWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(item.title, style: AppTheme.taskTitleTextStyle),
+                    Text(
+                      item.title,
+                      style: AppTheme.taskTitleTextStyle.copyWith(
+                        decoration: item.isDone
+                            ? TextDecoration.lineThrough
+                            : null,
+                        color: item.isDone ? Colors.grey : Colors.black,
+                      ),
+                    ),
                     const SizedBox(height: 12),
-                    Text(item.description,
-                        style: AppTheme.taskDescriptionTextStyle),
+                    Text(
+                      item.description,
+                      style: AppTheme.taskDescriptionTextStyle,
+                    ),
                   ],
                 ),
               ),
@@ -79,10 +86,30 @@ class TodoWidget extends StatelessWidget {
                 padding:
                 const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: AppColors.primiary),
-                child: const Icon(Icons.check,
-                    color: AppColors.white, size: 32),
+                  borderRadius: BorderRadius.circular(12),
+                  color: item.isDone ? Colors.green : AppColors.primiary,
+                ),
+                child: InkWell(
+                  onTap: () async {
+                    item.isDone = !item.isDone;
+                    await provider.updateTodo(item);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          item.isDone
+                              ? "✅ Task marked as completed"
+                              : "↩️ Task marked as uncompleted",
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Icon(
+                    Icons.check,
+                    color: AppColors.white,
+                    size: 32,
+                  ),
+                ),
               ),
             ],
           ),

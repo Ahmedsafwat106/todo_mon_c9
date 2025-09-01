@@ -22,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Padding(
         padding: const EdgeInsets.all(14.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 50),
             TextFormField(
@@ -36,27 +37,31 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 26),
             ElevatedButton(
-                onPressed: loginLocally,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                  child: Row(
-                    children: [
-                      Text("Login", style: TextStyle(fontSize: 18)),
-                      Spacer(),
-                      Icon(Icons.arrow_forward)
-                    ],
-                  ),
-                )),
-            const SizedBox(height: 18),
-            InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, RegisterScreen.routeName);
-              },
-              child: const Text(
-                "Create account",
-                style: TextStyle(fontSize: 18, color: Colors.black45),
+              onPressed: loginLocally,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                child: Row(
+                  children: [
+                    Text("Login", style: TextStyle(fontSize: 18)),
+                    Spacer(),
+                    Icon(Icons.arrow_forward),
+                  ],
+                ),
               ),
             ),
+            const Spacer(), // 🟢 ده اللي يخلي اللينك ينزل تحت
+            Center(
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, RegisterScreen.routeName);
+                },
+                child: const Text(
+                  "Create account",
+                  style: TextStyle(fontSize: 18, color: Colors.blue),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),

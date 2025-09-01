@@ -16,17 +16,49 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int currentTabIndex = 0;
   late ListProvider provider;
-  final List<Widget> tabs = [ListTab(), const SettingsTab()];
+
+  bool isSearching = false;
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    provider = Provider.of<ListProvider>(context);
+    // 🟢 دا يضمن إن التاسكات تتجاب دايمًا أول ما يفتح HomeScreen
+    provider.getTodosFromLocal();
+  }
 
   @override
   Widget build(BuildContext context) {
-    provider = Provider.of(context);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("${AppUser.currentUser?.username ?? ""}"),
+        title: isSearching
+            ? TextField(
+          controller: searchController,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: "Search tasks...",
+            border: InputBorder.none,
+          ),
+          onChanged: (_) {
+            setState(() {}); // تحديث الشاشة عشان يفلتر
+          },
+        )
+            : Text("${AppUser.currentUser?.username ?? ""}"),
         toolbarHeight: MediaQuery.of(context).size.height * .08,
         actions: [
+          if (currentTabIndex == 0) // زرار السيرش يظهر بس في Tasks
+            IconButton(
+              icon: Icon(isSearching ? Icons.close : Icons.search),
+              onPressed: () {
+                setState(() {
+                  if (isSearching) {
+                    searchController.clear();
+                  }
+                  isSearching = !isSearching;
+                });
+              },
+            ),
           InkWell(
             onTap: () async {
               provider.todos.clear();
@@ -40,10 +72,16 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: currentTabIndex == 0
-              ? LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade50])
-              : LinearGradient(colors: [Colors.grey.shade300, Colors.white]),
+              ? LinearGradient(
+            colors: [Colors.blue.shade200, Colors.blue.shade50],
+          )
+              : LinearGradient(
+            colors: [Colors.grey.shade300, Colors.white],
+          ),
         ),
-        child: tabs[currentTabIndex],
+        child: currentTabIndex == 0
+            ? ListTab(searchQuery: searchController.text)
+            : const SettingsTab(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -53,7 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (_) => SingleChildScrollView(
               child: Container(
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
                 child: AddBottomSheet(),
               ),
             ),
@@ -72,8 +111,10 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           currentIndex: currentTabIndex,
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.checklist), label: "Tasks"),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.checklist), label: "Tasks"),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.settings), label: "Settings"),
           ],
         ),
       ),

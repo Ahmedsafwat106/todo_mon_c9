@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,14 +32,35 @@ class SettingsTab extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () async {
-              final result = await FilePicker.platform.pickFiles();
-              if (result != null && result.files.single.path != null) {
-                final file = File(result.files.single.path!);
-                await BackupService.importTodos(file);
-                await provider.getTodosFromLocal();
+              try {
+                final result = await FilePicker.platform.pickFiles();
+                if (result != null && result.files.single.path != null) {
+                  final file = File(result.files.single.path!);
 
+                  // ✅ جرب اقرأ الملف الأول
+                  final content = await file.readAsString();
+                  jsonDecode(content); // لو مش JSON هيرمي Exception
+
+                  // 🟢 استدعاء الاستيراد
+                  final importedTasks = await BackupService.importTodos(file);
+
+                  // 🟢 خلي الـ provider يضيف التاسكات + يحدث اللستة
+                  await provider.importTasks(importedTasks);
+                  await provider.getTodosFromLocal();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("✅ Tasks imported successfully!"),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("✅ Tasks imported successfully!")),
+                  SnackBar(
+                    content: Text("❌ Import failed: الملف غير صالح"),
+                    backgroundColor: Colors.red,
+                  ),
                 );
               }
             },
